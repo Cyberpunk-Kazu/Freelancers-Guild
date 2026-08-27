@@ -6,6 +6,66 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    body {
+        font-family: var(--font-sans);
+    }
+}
+
+@layer components {
+    .guild-display {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 500;
+    }
+
+    .guild-script {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-weight: 500;
+    }
+
+    .guild-input {
+        width: 100%;
+        border: 1px solid #ddd4cb;
+        border-radius: 9px;
+        background: #fff;
+        padding: 16px 20px;
+        color: #132b2d;
+        outline: none;
+        transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .guild-input::placeholder {
+        color: #9b91b5;
+    }
+
+    .guild-input:focus {
+        border-color: #527c7d;
+        box-shadow: 0 0 0 3px rgb(82 124 125 / 15%);
+    }
+
+    .guild-panel {
+        background-color: #1d383a;
+        background-image: linear-gradient(rgb(70 119 120 / 13%) 1px, transparent 1px),
+            linear-gradient(90deg, rgb(70 119 120 / 13%) 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
+
+    .guild-emblem {
+        display: grid;
+        width: 44px;
+        height: 44px;
+        place-items: center;
+        border: 1px solid #3d7274;
+        border-radius: 9999px;
+        font-size: 18px;
+    }
+
+    .guild-emblem-active {
+        background: #29494a;
+        color: #f0b08a;
+    }
 }
