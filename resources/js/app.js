@@ -1,6 +1,7 @@
 import './bootstrap';
 import {
     createUserWithEmailAndPassword,
+    confirmPasswordReset,
     getAuth,
     GoogleAuthProvider,
     sendPasswordResetEmail,
@@ -9,6 +10,7 @@ import {
     signInWithPopup,
     signOut,
     updateProfile,
+    verifyPasswordResetCode,
 } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
@@ -175,7 +177,8 @@ document.querySelector('[data-firebase-forgot]')?.addEventListener('submit', asy
 
     try {
         await sendPasswordResetEmail(auth, form.email.value, {
-            url: `${window.location.origin}/login`,
+            handleCodeInApp: true,
+            url: `${window.location.origin}/reset-password`,
         });
         status.textContent = 'If an account exists for that email, a password reset link has been sent.';
         status.classList.remove('hidden');
@@ -185,6 +188,56 @@ document.querySelector('[data-firebase-forgot]')?.addEventListener('submit', asy
     } finally {
         button.disabled = false;
         button.textContent = 'Send Reset Link';
+    }
+});
+
+document.querySelector('[data-firebase-reset]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const error = form.querySelector('[data-firebase-error]');
+    const status = form.querySelector('[data-firebase-status]');
+    const code = new URLSearchParams(window.location.search).get('oobCode');
+    const password = form.password.value;
+
+    error?.classList.add('hidden');
+    status?.classList.add('hidden');
+
+    if (!code) {
+        error.textContent = 'This password reset link is invalid.';
+        error.classList.remove('hidden');
+        return;
+    }
+
+    if (password.length < 10 || !/[A-Z]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        error.textContent = 'Password must be at least 10 characters and include an uppercase letter and special character.';
+        error.classList.remove('hidden');
+        return;
+    }
+
+    if (password !== form.password_confirmation.value) {
+        error.textContent = 'Passwords do not match.';
+        error.classList.remove('hidden');
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'Resetting...';
+
+    try {
+        await verifyPasswordResetCode(auth, code);
+        await confirmPasswordReset(auth, code, password);
+        status.textContent = 'Your password has been reset. You can now sign in.';
+        status.classList.remove('hidden');
+        form.reset();
+        button.classList.add('hidden');
+    } catch (exception) {
+        error.textContent = exception.code === 'auth/expired-action-code'
+            ? 'This password reset link has expired.'
+            : exception.message;
+        error.classList.remove('hidden');
+        button.disabled = false;
+        button.textContent = 'Reset Password';
     }
 });
 

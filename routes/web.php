@@ -18,6 +18,7 @@ Route::get('/verify-email', [EmailVerificationController::class, 'create'])->nam
 Route::post('/verify-email', [EmailVerificationController::class, 'store'])->name('verification.verify');
 Route::post('/verify-email/resend', [EmailVerificationController::class, 'resend'])->name('verification.resend');
 Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+Route::view('/reset-password', 'auth.reset-password')->name('password.reset');
 Route::view('/dashboard', 'dashboard')->middleware('auth')->name('dashboard');
 Route::post('/logout', function () {
     Auth::logout();
