@@ -36,15 +36,15 @@
                 </div>
 
                 <p class="relative z-10 font-mono text-xs tracking-wide text-[#507477]">
-                    All adventurers aged 18 and above are welcome · Local realm only
+                    All adventurers aged 18 and above are welcome
                 </p>
             </section>
 
             <section class="flex min-h-screen items-center justify-center px-6 py-8 sm:px-16 lg:px-20">
                 <div class="w-full max-w-[560px]">
                     <nav class="mb-12 grid grid-cols-2 rounded-xl bg-[#eee8e1] p-1 text-center font-semibold text-[#7f7a76]">
-                        <a href="#signin" class="rounded-lg bg-white px-4 py-4 text-[#132b2d] shadow-[0_2px_4px_rgba(34,29,25,.12)]">Sign In</a>
-                        <a href="#create-account" class="px-4 py-4">Create Account</a>
+                        <a href="{{ route('login') }}" class="rounded-lg bg-white px-4 py-4 text-[#132b2d] shadow-[0_2px_4px_rgba(34,29,25,.12)]">Sign In</a>
+                        <a href="{{ route('register') }}" class="px-4 py-4">Create Account</a>
                     </nav>
 
                     <header class="mb-10">
@@ -52,7 +52,7 @@
                         <p class="mt-2 text-lg text-[#817b76]">Your guild record awaits. Return to the hall.</p>
                     </header>
 
-                    <form id="signin" class="space-y-5" action="#" method="post">
+                    <form id="signin" class="space-y-5" action="{{ route('login.store') }}" method="post">
                         @csrf
                         <div>
                             <label for="email" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">EMAIL ADDRESS</label>
@@ -80,9 +80,23 @@
                         </button>
                     </form>
 
+                    @if ($errors->any())
+                        <p class="mt-4 text-sm text-[#c04e2b]">{{ $errors->first() }}</p>
+                    @endif
+
+                    <div class="my-8 flex items-center gap-4 text-sm text-[#b0a59c]">
+                        <span class="h-px flex-1 bg-[#ddd4cb]"></span>
+                        <span>OR</span>
+                        <span class="h-px flex-1 bg-[#ddd4cb]"></span>
+                    </div>
+
+                    <a href="{{ route('auth.google.redirect') }}" class="block w-full rounded-[9px] border border-[#ddd4cb] bg-[#f2ebe3] px-4 py-4 text-center font-medium text-[#243537] transition hover:bg-[#e9dfd5]">
+                        Continue with Google
+                    </a>
+
                     <p class="mt-8 text-center text-base text-[#817b76]">
                         No account yet?
-                        <a href="#create-account" class="font-bold text-[#132b2d] hover:underline">Create one free</a>
+                        <a href="{{ route('register') }}" class="font-bold text-[#132b2d] hover:underline">Create one free</a>
                     </p>
                 </div>
             </section>
