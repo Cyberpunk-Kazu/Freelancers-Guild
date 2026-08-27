@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\FirebaseController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -13,6 +14,9 @@ Route::get('/login', [LoginController::class, 'create'])->name('login');
 Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 Route::get('/register', [RegisterController::class, 'create'])->name('register');
 Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+Route::get('/verify-email', [EmailVerificationController::class, 'create'])->name('verification.notice');
+Route::post('/verify-email', [EmailVerificationController::class, 'store'])->name('verification.verify');
+Route::post('/verify-email/resend', [EmailVerificationController::class, 'resend'])->name('verification.resend');
 Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->name('password.email');
 Route::get('/reset-password/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');

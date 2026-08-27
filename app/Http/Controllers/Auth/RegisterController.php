@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Auth;
 use App\Domain\Users\Models\User;
 use App\Domain\Users\Rules\ValidGuildName;
 use App\Http\Controllers\Controller;
+use App\Domain\Users\Models\EmailVerificationCode;
+use App\Mail\EmailVerificationCodeMail;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class RegisterController extends Controller
@@ -40,10 +42,16 @@ class RegisterController extends Controller
             'password' => Hash::make($attributes['password']),
         ]);
 
+        $code = (string) random_int(100000, 999999);
+        EmailVerificationCode::create([
+            'user_id' => $user->id,
+            'code' => Hash::make($code),
+            'expires_at' => now()->addMinutes(10),
+        ]);
+        Mail::to($user->email)->send(new EmailVerificationCodeMail($user, $code));
         event(new Registered($user));
-        Auth::login($user);
-        $request->session()->regenerate();
+        $request->session()->put('verification_user_id', $user->id);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('verification.notice');
     }
 }

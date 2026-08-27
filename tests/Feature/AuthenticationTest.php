@@ -1,14 +1,20 @@
 <?php
 
 use App\Domain\Users\Models\User;
+use App\Domain\Users\Models\EmailVerificationCode;
+use App\Mail\EmailVerificationCodeMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
 test('a visitor can create an account', function () {
+    Mail::fake();
+
     $response = $this->post(route('register.store'), [
         'name' => 'Guild Adventurer',
         'email' => 'adventurer@example.com',
@@ -16,8 +22,12 @@ test('a visitor can create an account', function () {
         'password_confirmation' => 'Password123!',
     ]);
 
-    $response->assertRedirect(route('dashboard'));
-    $this->assertAuthenticatedAs(User::where('email', 'adventurer@example.com')->first());
+    $response->assertRedirect(route('verification.notice'));
+    $this->assertGuest();
+    $user = User::where('email', 'adventurer@example.com')->first();
+    expect($user->email_verified_at)->toBeNull();
+    expect(EmailVerificationCode::where('user_id', $user->id)->exists())->toBeTrue();
+    Mail::assertSent(EmailVerificationCodeMail::class);
 });
 
 test('an account requires a valid human name', function () {
@@ -62,6 +72,23 @@ test('a registered user can sign in', function () {
 
     $response->assertRedirect(route('dashboard'));
     $this->assertAuthenticatedAs($user);
+});
+
+test('a user can verify their email with the code', function () {
+    Mail::fake();
+    $user = User::factory()->create(['email_verified_at' => null]);
+    $this->withSession(['verification_user_id' => $user->id]);
+    EmailVerificationCode::create([
+        'user_id' => $user->id,
+        'code' => Hash::make('123456'),
+        'expires_at' => now()->addMinutes(10),
+    ]);
+
+    $response = $this->post(route('verification.verify'), ['code' => '123456']);
+
+    $response->assertRedirect(route('dashboard'));
+    $this->assertAuthenticatedAs($user);
+    expect($user->fresh()->email_verified_at)->not->toBeNull();
 });
 
 test('guests cannot access the guild hall', function () {
