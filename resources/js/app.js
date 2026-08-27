@@ -33,7 +33,12 @@ const authenticateWithLaravel = async (user) => {
     });
 
     if (!response.ok) {
-        throw new Error('The guild could not verify your account.');
+        const payload = await response.json().catch(() => ({}));
+        const validationMessage = payload.errors
+            ? Object.values(payload.errors).flat()[0]
+            : null;
+
+        throw new Error(validationMessage || payload.message || 'The guild could not verify your account.');
     }
 
     window.location.assign((await response.json()).redirect);
