@@ -80,17 +80,6 @@
                         </button>
                     </form>
 
-                    <div class="my-8 flex items-center gap-4 text-sm text-[#b0a59c]">
-                        <span class="h-px flex-1 bg-[#ddd4cb]"></span>
-                        <span>OR</span>
-                        <span class="h-px flex-1 bg-[#ddd4cb]"></span>
-                    </div>
-
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        <button type="button" class="rounded-[9px] border border-[#ddd4cb] bg-[#f2ebe3] px-4 py-4 font-medium text-[#243537] transition hover:bg-[#e9dfd5]">Continue with Google</button>
-                        <button type="button" class="rounded-[9px] border border-[#ddd4cb] bg-[#f2ebe3] px-4 py-4 font-medium text-[#243537] transition hover:bg-[#e9dfd5]">Continue with Facebook</button>
-                    </div>
-
                     <p class="mt-8 text-center text-base text-[#817b76]">
                         No account yet?
                         <a href="#create-account" class="font-bold text-[#132b2d] hover:underline">Create one free</a>
