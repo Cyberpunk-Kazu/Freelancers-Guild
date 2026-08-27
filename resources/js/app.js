@@ -3,6 +3,7 @@ import {
     createUserWithEmailAndPassword,
     getAuth,
     GoogleAuthProvider,
+    sendPasswordResetEmail,
     sendEmailVerification,
     signInWithEmailAndPassword,
     signInWithPopup,
@@ -158,6 +159,32 @@ document.querySelector('[data-firebase-check]')?.addEventListener('click', async
         displayFirebaseError(error, exception);
         button.disabled = false;
         button.textContent = 'I Verified My Email';
+    }
+});
+
+document.querySelector('[data-firebase-forgot]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const error = form.querySelector('[data-firebase-error]');
+    const status = form.querySelector('[data-firebase-status]');
+    button.disabled = true;
+    button.textContent = 'Sending...';
+    error?.classList.add('hidden');
+    status?.classList.add('hidden');
+
+    try {
+        await sendPasswordResetEmail(auth, form.email.value, {
+            url: `${window.location.origin}/login`,
+        });
+        status.textContent = 'If an account exists for that email, a password reset link has been sent.';
+        status.classList.remove('hidden');
+        form.reset();
+    } catch (exception) {
+        displayFirebaseError(error, exception);
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Send Reset Link';
     }
 });
 

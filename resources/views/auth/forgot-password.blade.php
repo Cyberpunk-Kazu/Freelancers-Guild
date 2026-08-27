@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>Forgot password · {{ config('app.name', 'Freelancers Guild') }}</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,14 +42,15 @@
                         <p class="mb-5 text-sm text-[#477778]">{{ session('status') }}</p>
                     @endif
 
-                    <form class="space-y-5" action="{{ route('password.email') }}" method="post">
-                        @csrf
+                    <form class="space-y-5" data-firebase-forgot>
                         <div>
                             <label for="email" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">EMAIL ADDRESS</label>
                             <input id="email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" placeholder="you@example.com" class="guild-input" required>
                             @error('email') <p class="mt-2 text-sm text-[#c04e2b]">{{ $message }}</p> @enderror
                         </div>
                         <button type="submit" class="w-full rounded-[9px] bg-[#223b3d] px-6 py-4 font-bold text-white transition hover:bg-[#172e30]">Send Reset Link</button>
+                        <p data-firebase-error class="hidden text-sm text-[#c04e2b]"></p>
+                        <p data-firebase-status class="hidden text-sm text-[#477778]"></p>
                     </form>
 
                     <p class="mt-8 text-center text-base text-[#817b76]">

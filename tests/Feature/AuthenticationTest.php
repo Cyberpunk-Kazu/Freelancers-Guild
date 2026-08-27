@@ -4,11 +4,8 @@ use App\Domain\Users\Models\User;
 use App\Domain\Users\Models\EmailVerificationCode;
 use App\Mail\EmailVerificationCodeMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
@@ -94,14 +91,4 @@ test('a user can verify their email with the code', function () {
 test('guests cannot access the guild hall', function () {
     $this->get(route('dashboard'))
         ->assertRedirect(route('login'));
-});
-
-test('a user can request a password reset link', function () {
-    Notification::fake();
-    $user = User::factory()->create();
-
-    $response = $this->post(route('password.email'), ['email' => $user->email]);
-
-    $response->assertSessionHas('status', __('passwords.sent'));
-    Notification::assertSentTo($user, ResetPassword::class);
 });
