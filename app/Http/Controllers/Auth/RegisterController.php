@@ -21,7 +21,7 @@ class RegisterController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $attributes = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[\pL\pM]+(?:[ \'\-][\pL\pM]+)*$/u'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', 'string', 'min:10', 'regex:/[A-Z]/', 'regex:/[^A-Za-z0-9]/'],
         ]);

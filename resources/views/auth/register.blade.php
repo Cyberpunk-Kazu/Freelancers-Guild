@@ -47,6 +47,7 @@
                         <div>
                             <label for="name" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">FULL NAME</label>
                             <input id="name" name="name" type="text" autocomplete="name" value="{{ old('name') }}" placeholder="Your name" class="guild-input" required>
+                            <p class="mt-2 text-sm text-[#817b76]">Use letters, spaces, apostrophes, or hyphens.</p>
                             @error('name') <p class="mt-2 text-sm text-[#c04e2b]">{{ $message }}</p> @enderror
                         </div>
                         <div>

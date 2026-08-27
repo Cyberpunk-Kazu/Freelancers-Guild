@@ -20,6 +20,19 @@ test('a visitor can create an account', function () {
     $this->assertAuthenticatedAs(User::where('email', 'adventurer@example.com')->first());
 });
 
+test('an account requires a valid human name', function () {
+    $response = $this->from(route('register'))->post(route('register.store'), [
+        'name' => '123_troll',
+        'email' => 'adventurer@example.com',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
+    ]);
+
+    $response->assertRedirect(route('register'));
+    $response->assertSessionHasErrors('name');
+    $this->assertDatabaseMissing('users', ['email' => 'adventurer@example.com']);
+});
+
 test('a registered user can sign in', function () {
     $user = User::factory()->create([
         'password' => 'password123',
