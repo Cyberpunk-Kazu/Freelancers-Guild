@@ -90,9 +90,10 @@
                         <span class="h-px flex-1 bg-[#ddd4cb]"></span>
                     </div>
 
-                    <a href="{{ route('auth.google.redirect') }}" class="block w-full rounded-[9px] border border-[#ddd4cb] bg-[#f2ebe3] px-4 py-4 text-center font-medium text-[#243537] transition hover:bg-[#e9dfd5]">
+                    <button type="button" data-firebase-google class="block w-full rounded-[9px] border border-[#ddd4cb] bg-[#f2ebe3] px-4 py-4 text-center font-medium text-[#243537] transition hover:bg-[#e9dfd5]">
                         Continue with Google
-                    </a>
+                    </button>
+                    <p data-firebase-error class="mt-3 hidden text-center text-sm text-[#c04e2b]"></p>
 
                     <p class="mt-8 text-center text-base text-[#817b76]">
                         No account yet?
