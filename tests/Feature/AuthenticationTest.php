@@ -33,6 +33,19 @@ test('an account requires a valid human name', function () {
     $this->assertDatabaseMissing('users', ['email' => 'adventurer@example.com']);
 });
 
+test('an account rejects inappropriate names', function () {
+    $response = $this->from(route('register'))->post(route('register.store'), [
+        'name' => 'Guild Fuck',
+        'email' => 'adventurer@example.com',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
+    ]);
+
+    $response->assertRedirect(route('register'));
+    $response->assertSessionHasErrors('name');
+    $this->assertDatabaseMissing('users', ['email' => 'adventurer@example.com']);
+});
+
 test('a registered user can sign in', function () {
     $user = User::factory()->create([
         'password' => 'password123',

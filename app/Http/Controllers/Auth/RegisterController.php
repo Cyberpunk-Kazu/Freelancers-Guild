@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Domain\Users\Models\User;
+use App\Domain\Users\Rules\ValidGuildName;
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +22,14 @@ class RegisterController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $attributes = $request->validate([
-            'name' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[\pL\pM]+(?:[ \'\-][\pL\pM]+)*$/u'],
+            'name' => [
+                'required',
+                'string',
+                'min:2',
+                'max:100',
+                'regex:/^[\pL\pM]+(?:[ \'\-][\pL\pM]+)*$/u',
+                new ValidGuildName,
+            ],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', 'string', 'min:10', 'regex:/[A-Z]/', 'regex:/[^A-Za-z0-9]/'],
         ]);
