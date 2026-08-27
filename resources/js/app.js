@@ -1,5 +1,14 @@
 import './bootstrap';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+    createUserWithEmailAndPassword,
+    getAuth,
+    GoogleAuthProvider,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    signOut,
+    updateProfile,
+} from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
 const firebaseApp = initializeApp({
@@ -10,39 +19,138 @@ const firebaseApp = initializeApp({
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
 });
+const auth = getAuth(firebaseApp);
 
-const googleButton = document.querySelector('[data-firebase-google]');
+const authenticateWithLaravel = async (user) => {
+    const response = await fetch('/auth/firebase', {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ?? '',
+        },
+        body: JSON.stringify({ id_token: await user.getIdToken(true) }),
+    });
 
-googleButton?.addEventListener('click', async () => {
+    if (!response.ok) {
+        throw new Error('The guild could not verify your account.');
+    }
+
+    window.location.assign((await response.json()).redirect);
+};
+
+const displayFirebaseError = (error, exception) => {
+    error.textContent = exception.code === 'auth/popup-closed-by-user'
+        ? 'Google sign-in was cancelled.'
+        : exception.message;
+    error.classList.remove('hidden');
+};
+
+document.querySelector('[data-firebase-google]')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
     const error = document.querySelector('[data-firebase-error]');
-    googleButton.disabled = true;
-    googleButton.textContent = 'Opening Google...';
+    button.disabled = true;
+    button.textContent = 'Opening Google...';
     error?.classList.add('hidden');
 
     try {
-        const result = await signInWithPopup(getAuth(firebaseApp), new GoogleAuthProvider());
-        const response = await fetch('/auth/firebase', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ?? '',
-            },
-            body: JSON.stringify({ id_token: await result.user.getIdToken() }),
-        });
+        const result = await signInWithPopup(auth, new GoogleAuthProvider());
+        await authenticateWithLaravel(result.user);
+    } catch (exception) {
+        displayFirebaseError(error, exception);
+        button.disabled = false;
+        button.textContent = 'Continue with Google';
+    }
+});
 
-        if (!response.ok) {
-            throw new Error('The guild could not verify your Google account.');
+document.querySelector('[data-firebase-login]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const error = document.querySelector('[data-firebase-error]');
+    button.disabled = true;
+    button.textContent = 'Entering the hall...';
+    error?.classList.add('hidden');
+
+    try {
+        const result = await signInWithEmailAndPassword(auth, form.email.value, form.password.value);
+
+        if (! result.user.emailVerified) {
+            window.location.assign('/verify-email');
+            return;
         }
 
-        window.location.assign((await response.json()).redirect);
+        await authenticateWithLaravel(result.user);
     } catch (exception) {
-        error.textContent = exception.code === 'auth/popup-closed-by-user'
-            ? 'Google sign-in was cancelled.'
-            : exception.message;
+        displayFirebaseError(error, exception);
+        button.disabled = false;
+        button.textContent = 'Sign In';
+    }
+});
+
+document.querySelector('[data-firebase-register]')?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const error = form.querySelector('[data-firebase-error]');
+    const password = form.password.value;
+    button.disabled = true;
+    button.textContent = 'Creating your record...';
+    error?.classList.add('hidden');
+
+    if (password.length < 10 || !/[A-Z]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+        error.textContent = 'Password must be at least 10 characters and include an uppercase letter and special character.';
         error.classList.remove('hidden');
-        googleButton.disabled = false;
-        googleButton.textContent = 'Continue with Google';
+        button.disabled = false;
+        button.textContent = 'Create Account';
+        return;
+    }
+
+    if (password !== form.password_confirmation.value) {
+        error.textContent = 'Passwords do not match.';
+        error.classList.remove('hidden');
+        button.disabled = false;
+        button.textContent = 'Create Account';
+        return;
+    }
+
+    try {
+        const result = await createUserWithEmailAndPassword(auth, form.email.value, password);
+        await updateProfile(result.user, { displayName: form.name.value });
+        await sendEmailVerification(result.user, {
+            url: `${window.location.origin}/verify-email`,
+        });
+        window.location.assign('/verify-email');
+    } catch (exception) {
+        displayFirebaseError(error, exception);
+        button.disabled = false;
+        button.textContent = 'Create Account';
+    }
+});
+
+document.querySelector('[data-firebase-check]')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    const error = document.querySelector('[data-firebase-error]');
+    button.disabled = true;
+    button.textContent = 'Checking...';
+    error?.classList.add('hidden');
+
+    try {
+        if (!auth.currentUser) {
+            throw new Error('Your verification session expired. Please sign in again.');
+        }
+
+        await auth.currentUser.reload();
+
+        if (!auth.currentUser.emailVerified) {
+            throw new Error('Your email is not verified yet. Click the link in your email first.');
+        }
+
+        await authenticateWithLaravel(auth.currentUser);
+    } catch (exception) {
+        displayFirebaseError(error, exception);
+        button.disabled = false;
+        button.textContent = 'I Verified My Email';
     }
 });
 

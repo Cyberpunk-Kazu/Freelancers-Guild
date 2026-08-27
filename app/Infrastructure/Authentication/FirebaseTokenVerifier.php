@@ -37,6 +37,7 @@ class FirebaseTokenVerifier
             || ($claims['iss'] ?? null) !== "https://securetoken.google.com/{$projectId}"
             || empty($claims['sub'])
             || empty($claims['email'])
+            || ($claims['email_verified'] ?? false) !== true
         ) {
             throw ValidationException::withMessages([
                 'id_token' => 'The Google sign-in token was issued for another application.',

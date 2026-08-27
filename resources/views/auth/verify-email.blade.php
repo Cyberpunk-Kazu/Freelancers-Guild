@@ -31,27 +31,16 @@
                 <div class="w-full max-w-[560px]">
                     <header class="mb-10">
                         <h1 class="guild-display text-4xl tracking-[-.03em] text-[#0e2527] sm:text-5xl">Check your email</h1>
-                        <p class="mt-2 text-lg text-[#817b76]">Enter the six-digit code we sent to your registered email.</p>
+                        <p class="mt-2 text-lg text-[#817b76]">Click the verification link in your email, then return here to enter the hall.</p>
                     </header>
 
                     @if (session('status'))
                         <p class="mb-5 text-sm text-[#477778]">{{ session('status') }}</p>
                     @endif
 
-                    <form class="space-y-5" action="{{ route('verification.verify') }}" method="post">
-                        @csrf
-                        <div>
-                            <label for="code" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">VERIFICATION CODE</label>
-                            <input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" class="guild-input text-center text-2xl tracking-[.35em]" required>
-                            @error('code') <p class="mt-2 text-sm text-[#c04e2b]">{{ $message }}</p> @enderror
-                        </div>
-                        <button type="submit" class="w-full rounded-[9px] bg-[#223b3d] px-6 py-4 font-bold text-white transition hover:bg-[#172e30]">Verify Email</button>
-                    </form>
-
-                    <form class="mt-5 text-center" action="{{ route('verification.resend') }}" method="post">
-                        @csrf
-                        <button type="submit" class="font-medium text-[#d45d34] hover:underline">Send a new code</button>
-                    </form>
+                    <button type="button" data-firebase-check class="w-full rounded-[9px] bg-[#223b3d] px-6 py-4 font-bold text-white transition hover:bg-[#172e30]">I Verified My Email</button>
+                    <p data-firebase-error class="mt-4 hidden text-center text-sm text-[#c04e2b]"></p>
+                    <p class="mt-5 text-center text-base text-[#817b76]">Need another email? Check your spam folder or restart registration.</p>
                 </div>
             </section>
         </main>

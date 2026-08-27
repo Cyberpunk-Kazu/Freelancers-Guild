@@ -52,7 +52,7 @@
                         <p class="mt-2 text-lg text-[#817b76]">Your guild record awaits. Return to the hall.</p>
                     </header>
 
-                    <form id="signin" class="space-y-5" action="{{ route('login.store') }}" method="post">
+                    <form id="signin" class="space-y-5" action="{{ route('login.store') }}" method="post" data-firebase-login>
                         @csrf
                         <div>
                             <label for="email" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">EMAIL ADDRESS</label>

@@ -42,7 +42,7 @@
                         <p class="mt-2 text-lg text-[#817b76]">Create your record and answer the call.</p>
                     </header>
 
-                    <form class="space-y-5" action="{{ route('register.store') }}" method="post">
+                    <form class="space-y-5" data-firebase-register>
                         @csrf
                         <div>
                             <label for="name" class="mb-2 block text-sm font-bold tracking-wide text-[#273d3e]">FULL NAME</label>
@@ -66,7 +66,8 @@
                             <input id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" placeholder="Repeat your password" class="guild-input" required>
                         </div>
                         <button type="submit" class="w-full rounded-[9px] bg-[#223b3d] px-6 py-4 font-bold text-white transition hover:bg-[#172e30]">Create Account</button>
-                        <p class="text-sm text-[#817b76]">After registering, we will send a verification code to your email.</p>
+                        <p class="text-sm text-[#817b76]">After registering, Firebase will send a verification link to your email.</p>
+                        <p data-firebase-error class="hidden text-sm text-[#c04e2b]"></p>
                     </form>
 
                     <p class="mt-8 text-center text-base text-[#817b76]">
