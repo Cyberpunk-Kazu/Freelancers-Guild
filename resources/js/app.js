@@ -27,7 +27,9 @@ const authenticateWithLaravel = async (user) => {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value ?? '',
+            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]')?.value
+                ?? document.querySelector('meta[name="csrf-token"]')?.content
+                ?? '',
         },
         body: JSON.stringify({ id_token: await user.getIdToken(true) }),
     });
