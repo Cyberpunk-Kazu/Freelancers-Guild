@@ -14,6 +14,7 @@ class ValidGuildName implements ValidationRule
         'bitch',
         'damn',
         'fuck',
+        'nigga',
         'motherfucker',
         'shit',
         'slut',
@@ -22,15 +23,22 @@ class ValidGuildName implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        if (! self::passes((string) $value)) {
+            $fail('Please choose a respectful name.');
+        }
+    }
+
+    public static function passes(string $value): bool
+    {
         $normalized = mb_strtolower((string) preg_replace('/[^\pL]+/u', ' ', $value));
         $words = preg_split('/\s+/u', trim($normalized), -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($words as $word) {
             if (in_array($word, self::BLOCKED_WORDS, true)) {
-                $fail('Please choose a respectful name.');
-
-                return;
+                return false;
             }
         }
+
+        return true;
     }
 }

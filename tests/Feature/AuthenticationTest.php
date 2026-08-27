@@ -46,6 +46,10 @@ test('an account rejects inappropriate names', function () {
     $this->assertDatabaseMissing('users', ['email' => 'adventurer@example.com']);
 });
 
+test('the name policy rejects inappropriate words regardless of capitalization', function () {
+    expect(\App\Domain\Users\Rules\ValidGuildName::passes('NIGGA'))->toBeFalse();
+});
+
 test('a registered user can sign in', function () {
     $user = User::factory()->create([
         'password' => 'password123',
