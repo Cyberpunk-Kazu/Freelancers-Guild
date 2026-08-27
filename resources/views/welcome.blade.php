@@ -62,7 +62,7 @@
                         <div>
                             <div class="mb-2 flex items-center justify-between gap-4">
                                 <label for="password" class="text-sm font-bold tracking-wide text-[#273d3e]">PASSWORD</label>
-                                <a href="#" class="text-sm font-medium text-[#d45d34] hover:underline">Forgot password?</a>
+                                <a href="{{ route('password.request') }}" class="text-sm font-medium text-[#d45d34] hover:underline">Forgot password?</a>
                             </div>
                             <div class="relative">
                                 <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" class="guild-input pr-20" required>
@@ -82,6 +82,9 @@
 
                     @if ($errors->any())
                         <p class="mt-4 text-sm text-[#c04e2b]">{{ $errors->first() }}</p>
+                    @endif
+                    @if (session('status'))
+                        <p class="mt-4 text-sm text-[#477778]">{{ session('status') }}</p>
                     @endif
 
                     <div class="my-8 flex items-center gap-4 text-sm text-[#b0a59c]">

@@ -2,6 +2,9 @@
 
 use App\Domain\Users\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 
 uses(RefreshDatabase::class);
 
@@ -9,8 +12,8 @@ test('a visitor can create an account', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Guild Adventurer',
         'email' => 'adventurer@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
+        'password' => 'Password123!',
+        'password_confirmation' => 'Password123!',
     ]);
 
     $response->assertRedirect(route('dashboard'));
@@ -34,4 +37,14 @@ test('a registered user can sign in', function () {
 test('guests cannot access the guild hall', function () {
     $this->get(route('dashboard'))
         ->assertRedirect(route('login'));
+});
+
+test('a user can request a password reset link', function () {
+    Notification::fake();
+    $user = User::factory()->create();
+
+    $response = $this->post(route('password.email'), ['email' => $user->email]);
+
+    $response->assertSessionHas('status', __('passwords.sent'));
+    Notification::assertSentTo($user, ResetPassword::class);
 });
